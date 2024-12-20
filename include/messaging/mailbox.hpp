@@ -27,7 +27,7 @@ namespace task_mgnt {
             virtual Mailbox* create_other_party();
             //Notify interested parties (if any) that there
             //is new mail. 
-            virtual void notify_recipient();
+            virtual void notify_recipients();
             virtual void send(Letter& letter);
             virtual Letter receive();
             bool mail_for_me();
