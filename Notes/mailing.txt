@@ -1,0 +1,3 @@
+Should mail-handling be in its own thread?
+--Why? So worker threads need only worry about their work
+       and not about delivering their own mail.
