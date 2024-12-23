@@ -3,7 +3,7 @@
 namespace task_mgnt {
     namespace messaging {
         class Letter{
-
+        
         };
     };
 };

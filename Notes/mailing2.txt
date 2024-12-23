@@ -1,0 +1,15 @@
+Mailbox:
+//ARP-like functions:
+//Could be changed to return a pointer
+//to the target mailbox.
+std::string who_has(std::string task_id) {
+
+}
+
+void broadcast(Letter& letter)//?
+
+//This may or may not be needed.
+//I'm not sure if I want to 
+//handle Task ID management
+//this way.
+bool probe(std::string task_id); //needed?

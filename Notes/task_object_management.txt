@@ -1,0 +1,45 @@
+How do we assign task IDs?
+
+DHCP-like?  Where a task ID is handed out
+at random from within a given range 
+and where the "assigment object" keeps
+track of assigned addresses?
+
+Only, in this case, there is no record timeout.
+Instead, task IDs are reliquished as the tasks
+are either killed or end naturally.
+
+
+If task management is handled by
+the task runner, then
+
+
+Where do we root all of this?
+
+When we initialize the library,
+can we "evolve" the currently running
+thread into a special task runner
+running a pseudo-task representing
+the main thread?
+-- We might be able to do this using
+   global library structures that
+   are manipulated via the library API.
+
+-- The library itself would contain the 
+   root mailbox.
+
+Continuous Task:
+
+Keep in mind: Once we initialize the 
+library, we will be thrown into a runloop.
+
+If task has nothing to do, it can request
+to the runner that it be put to sleep.
+
+If a task RUNNER has nothing to do, it can
+put its thread to sleep.
+
+Can a Task instantiate a child and then
+pass ownership of that child to its own parent?
+-- Well, that is useful for setup actions.
+-- -- 

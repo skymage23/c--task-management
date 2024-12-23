@@ -10,13 +10,17 @@ namespace task_mgnt {
     namespace messaging {
         class Mailbox {
             private:
-            Mailbox* other_party;
             bool have_mail;
             bool can_send; //Not all Mailboxes can.
  
             protected:
             //Used when instantiating other parties.
-            Mailbox(Mailbox* input); 
+            Mailbox(Mailbox* input);
+
+            //Called by the other party, directly or otherwise.
+            //Puts the letter in the inbox and sets "have_mail"
+            //to "true".
+            void receive(Letter input);
 
             public:
             Mailbox() = delete;
@@ -26,7 +30,7 @@ namespace task_mgnt {
 
             virtual Mailbox* create_other_party();
             //Notify interested parties (if any) that there
-            //is new mail. 
+            //is new mail.
             virtual void notify_recipients();
             virtual void send(Letter& letter);
             virtual Letter receive();

@@ -1,0 +1,49 @@
+When we initialize the library,
+can we "evolve" the currently running
+thread into a special task runner
+running a pseudo-task representing
+the main thread?
+-- We might be able to do this using
+   global library structures that
+   are manipulated via the library API.
+
+-- The library itself would contain the 
+   root mailbox.
+
+
+We can make the initialization procedure
+such that you have to pass in a Task object that
+gets executed inside the root task runner
+that itself executes on the current thread.
+
+We still need a TaskManager that handles instantiating runners
+and attaching them to threads.
+
+
+We need signal handlers to make sure we can handle SIGTERM
+(and SIGINT(?)) cleanly.
+
+
+Perhaps, during instantiation, we can use a boolean parameter
+to determine whether the root TaskRunner executes on the current thread
+or on a new one.
+
+Signal handling is going to be a minor headache.
+
+For now, let's just catch SIGTERM and SIGHUP so that we can die gracefully
+and with dignity. Technically, we CAN set which thread handles them
+by masking all signals on all other threads.  Let's say we do that.
+What thread should these signal handlers run on?
+
+We could make the root task runner a "utility" task runner used
+to handle logging tasks and signal handling.
+
+
+What if ...
+
+If we choose NOT to set the root TaskRunner on the thread used to initialize the library,
+then we offer a "wait" function that can be used to
+
+--What about the signal handler artifacts? Do we just ASSUME that the apps own handlers (it any)
+will play nice with ours?  We could get any registered signal handlers and just have ours clean
+already registered handlers AFTER we handle the signal library-side.

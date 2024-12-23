@@ -1,3 +1,90 @@
 Should mail-handling be in its own thread?
 --Why? So worker threads need only worry about their work
        and not about delivering their own mail.
+
+No. I don't think we need to do this. We can just use
+mutexes to lock access.
+
+Let's say we use a "Payload" template to handle actual data transfer
+that that the Letter class is a wrapper around the "Payload" that
+also contains metadata about the mailing transaction:
+
+To, From, Is_Return,
+
+Payload class:
+
+std::string api_id;   //Not required to be set, but it can help organize communications.
+std::string label;
+std::string typename;
+
+private:
+std::shared_ptr<void> data;
+
+public:
+Payload(std::string api_id, std::string label, std::string typename, void* data);
+T extract();
+
+
+Payloads are passed to tasks. Letters are not. Letters are tied to the 
+mailing system.
+
+
+
+Senders and receivers are identified by string ids.
+A child task is always given the ID of its parent,
+and, by this, the parent can offer an API to get
+a list of the other children.
+
+string_ids are either set explicitly by the programmer or are generated at random.
+
+
+
+Ok. Now that we have an addressing system, how do we ensure that messages make it to the
+correct mailbox?  Letters are passed by value.
+
+How do we handle message routing?
+
+Initial communications must be routed using a "spanning tree".
+However, it will be possible for two mailboxes to have direct memory
+communication should both parties agree to this (one makes the request,
+the other agrees to it), bypassing spanning tree traversal
+after the first message.
+
+--This arrangement is similar to the spanning tree protocol used
+  by network switch software.
+
+
+Whether or not there is a "root task", there always needs to be
+a root mailbox.
+-- What if for library operation purposes we could create pseudo-
+   task for the thread and code segment that initializes
+   the task management library?
+
+-- Whenever we set up a new task runner (class that contains the mailboxes),
+   We could establish a direct memory relationship between that runner's
+   mailbox and that of its parent, creating a tree consisting of all
+   mailboxes.  If we do, we still need some way to indicate which
+   traversal routes to take to reach a specific mailbox. 
+   We still need a "MAC address table" (of a sort).
+
+--How will these tables get updated?:
+  The tables are built dynamically whenever one Task "sends" a message to another.
+
+-- -- There is a tradeoff.  Here, we trade message throughput for memory conservation.
+-- -- Because we will be typically dealing with a known number of tasks and limited
+          Task allocations we may be able to get away with building the table by
+          sending cascading notifications around the mailbox tree when a new
+          Task is created.
+
+-- How do we handle a Task finishing or being killed in regards to these routing tables?
+-- -- We could use a timeout field in the record entry.
+
+--Do we need a naming system (analogous to DNS)?
+
+
+std::string Mailbox::who_has(std::string task_id);
+
+If the task runner is associated with another thread, then that runner's part
+of the mailing operations will be handled within that thread. Else,
+all mailing operations will be ran on the same thread. Thus, mail
+operations should be quick.
