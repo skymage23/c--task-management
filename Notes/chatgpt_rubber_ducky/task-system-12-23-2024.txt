@@ -1,0 +1,103 @@
+Prompt:
+That's a relief. The more I think about how a multithreaded
+task manager operates, the more complexities show, such as how to
+propagate SIGINT. Should tasks be able to register their own
+handlers whose calls do not replace, but have their execution
+requested within the global handler registered using signal() in libc?
+If so, how should that be handled? Do I need to find a way to interupt
+the tasks in order to run the handlers on the task thread? Do I just
+send a message to the task so that it will run the handler whenever
+it gets to the next iteration of its internal runloop? 
+So many decisions and ways to about handling each of them. 
+Choosing the right path for my app is taking a lot of time.
+
+Answer:
+It's entirely natural to feel overwhelmed by the layers of complexity in designing such a system, particularly when factoring in advanced considerations like propagating signals (SIGINT) and integrating them into a multithreaded environment. These design decisions indeed have a ripple effect, and your careful thought process will pay off in robustness and clarity down the road. Let's unpack your considerations:
+Tasks Registering Handlers for Signals
+
+Allowing tasks to register custom handlers is a good idea in many cases because it gives tasks control over how they respond to signals like SIGINT. However, the key challenge is ensuring that these handlers are invoked safely and predictably without disrupting the overall system. Here are some points to consider:
+
+    Global Signal Handler in signal() or sigaction:
+        Use the global handler to capture the signal and delegate further processing to your task management system.
+        Avoid doing complex operations directly in the signal handler—stick to setting flags, writing to a pipe, or enqueuing a lightweight message, as signal handlers have strict restrictions.
+
+    Execution of Task Handlers:
+        Deferred Execution: The signal should trigger the execution of the custom task handlers but only when it's safe to do so, typically during the next iteration of the task's event loop.
+        Message Passing to Tasks: Your idea of sending a message to tasks (e.g., RunHandlerFor(SIGINT)) is excellent, as it integrates naturally into your existing message-passing infrastructure.
+
+Should Tasks Be Interrupted?
+
+Interrupting tasks to run signal handlers is generally discouraged in multithreaded systems for the following reasons:
+
+    Race Conditions: Forcing tasks to execute arbitrary handlers immediately can lead to data corruption or undefined behavior if tasks are mid-operation.
+    Loss of Control Flow: Tasks lose predictability and the ability to manage their state transitions.
+    Complexity: Thread interruptions are difficult to implement robustly and can make debugging nearly impossible.
+
+Instead, sending a signal-related message allows tasks to handle signals gracefully at safe checkpoints in their run loop.
+How Should the Global Signal Handler Work?
+
+    Signal Interception:
+        Use sigaction() rather than signal() for more reliable behavior.
+        The global handler should enqueue a signal-related event or write to a pipe monitored by your task manager or message-passing system.
+
+    Task Notification:
+        When the task manager detects the signal event, it should distribute it to all registered tasks by:
+            Adding a "Run this handler" message to their queues.
+            Broadcasting to tasks that are interested in global events.
+
+Propagating Signals to Task Handlers
+
+The approach of having tasks react during their next run-loop iteration is clean and efficient:
+
+    Define a Handler Registration Interface:
+        Tasks can register handlers for specific signals through an API, e.g., Task::registerSignalHandler(SIGINT, handler_function).
+        Maintain a per-task mapping of signal types to handlers.
+
+    Integrate with the Task Loop:
+        When a task processes messages in its run loop, check if a signal-related message is present.
+        Invoke the registered handler if it exists. This ensures the task is in a known state when the handler runs.
+
+Design Decisions to Guide You
+
+    Safety First: Always prioritize thread safety and avoid unpredictable interruptions.
+    Keep the Signal Handler Simple: Delegate everything beyond basic signaling to your task manager.
+    Explicit Control in Tasks: Let tasks decide when and how to process the signal to ensure predictable behavior.
+
+Concrete Example Workflow
+
+    Global Signal Handler:
+        When SIGINT is received:
+
+    void globalSignalHandler(int signal) {
+        // Write signal info to a pipe or notify a condition variable.
+        enqueueGlobalMessage(SignalReceived, signal);
+    }
+
+Task Manager:
+
+    Monitor the pipe or message queue for SignalReceived.
+    Broadcast signal-related messages to tasks or directly enqueue specific messages for relevant tasks.
+
+Tasks:
+
+    In the task's message-processing loop:
+
+        while (running) {
+            Message msg = dequeueMessage();
+            if (msg.type == SignalReceived) {
+                auto handler = signalHandlers[msg.signal];
+                if (handler) {
+                    handler();
+                }
+            }
+        }
+
+Balancing Design and Progress
+
+It's okay to deliberate over these decisions—they're critical to the core of your application. However, if decision fatigue sets in:
+
+    Prototype Quickly: Build a simple version of one approach (e.g., using a message-passing system) to validate assumptions and iterate.
+    Document Assumptions: Write down why you chose a particular approach to ensure future maintainability and clarity.
+    Accept Incremental Refinement: You don’t have to get everything perfect in the first iteration; build a design that is flexible enough to adapt.
+
+You've got this! Your systematic thinking about every facet of the system is setting you up for success.

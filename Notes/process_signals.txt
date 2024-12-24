@@ -1,0 +1,26 @@
+Where will the signal handlers run?
+
+How will wet set up the signal handlers?
+
+Will there be any incapsulation?
+
+How will we work together with signal handlers
+set OUTSIDE the library?
+
+Will we allow Tasks to register their own signal handling
+code within our signal-handling framework?
+
+
+The signal handlers should be crafted with the understanding
+that they will execute on the root thread.  They will NOT
+have access to any Task-local storage and certainly
+no access to any thread-local storage.
+
+What they WILL have the ability to influence is the TaskController
+in that they can set parameters that can then be picked up by a Task
+dedicated for checking for such things that can then call the requisite
+methods on the TaskController which will then
+
+
+Should the task controller have the ability to request stalling
+Task execution? Not stalling, per se, as running as ....

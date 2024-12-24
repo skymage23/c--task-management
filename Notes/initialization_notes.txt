@@ -30,7 +30,7 @@ or on a new one.
 
 Signal handling is going to be a minor headache.
 
-For now, let's just catch SIGTERM and SIGHUP so that we can die gracefully
+For now, let's just catch SIGINT, SIGTERM, and SIGHUP so that we can die gracefully
 and with dignity. Technically, we CAN set which thread handles them
 by masking all signals on all other threads.  Let's say we do that.
 What thread should these signal handlers run on?
@@ -47,3 +47,6 @@ then we offer a "wait" function that can be used to
 --What about the signal handler artifacts? Do we just ASSUME that the apps own handlers (it any)
 will play nice with ours?  We could get any registered signal handlers and just have ours clean
 already registered handlers AFTER we handle the signal library-side.
+
+
+What happens if we get an error IN the signal handler?
