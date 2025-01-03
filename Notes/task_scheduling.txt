@@ -1,0 +1,15 @@
+The primary thread scheduling algorithm used by Linux is called the Completely Fair Scheduler (CFS), which essentially distributes CPU time fairly among all running threads by utilizing a weighted fair queueing approach, where each thread is assigned a "weight" representing its priority, and the thread with the lowest virtual runtime (calculated based on its weight and actual runtime) is chosen to run next. 
+Key points about CFS:
+Virtual runtime:
+Each thread accumulates a virtual runtime which reflects how long it has effectively run relative to its weight, allowing for fairer scheduling between threads with different priorities.
+Red-black tree:
+The run queue where runnable threads are stored is implemented as a red-black tree, which enables efficient selection of the thread with the lowest virtual runtime.
+Priority management:
+Thread priorities are managed using "nice" values, where lower nice values indicate higher priority. 
+Other important aspects of Linux thread scheduling:
+Preemptive scheduling:
+Linux uses preemptive scheduling, meaning a running thread can be interrupted at any time if a higher priority thread becomes ready to run. 
+Real-time scheduling:
+Linux provides dedicated real-time scheduling policies (like SCHED_FIFO and SCHED_RR) for threads requiring strict timing guarantees, which are prioritized over normal threads. 
+Multi-level queues:
+Depending on the scheduling policy, threads may be organized into different queues based on their priority, allowing for efficient scheduling of threads with diverse priority levels.

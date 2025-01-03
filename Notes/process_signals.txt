@@ -24,3 +24,8 @@ methods on the TaskController which will then
 
 Should the task controller have the ability to request stalling
 Task execution? Not stalling, per se, as running as ....
+
+How to propagate signals?
+
+Better to propagate them via the mailing system.  Easier to handle that way.
+So that's what we will do.  The versioning/rollback/interrupt system will come later.

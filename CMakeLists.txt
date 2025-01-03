@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(jpeg-endianness-tests  CXX)
+project(cplusplus-task-management  CXX)
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 

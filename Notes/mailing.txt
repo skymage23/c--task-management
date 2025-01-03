@@ -6,7 +6,7 @@ No. I don't think we need to do this. We can just use
 mutexes to lock access.
 
 Let's say we use a "Payload" template to handle actual data transfer
-that that the Letter class is a wrapper around the "Payload" that
+that that the BaseLetter class is a wrapper around the "Payload" that
 also contains metadata about the mailing transaction:
 
 To, From, Is_Return,
@@ -25,7 +25,7 @@ Payload(std::string api_id, std::string label, std::string typename, void* data)
 T extract();
 
 
-Payloads are passed to tasks. Letters are not. Letters are tied to the 
+Payloads are passed to tasks. BaseLetters are not. BaseLetters are tied to the 
 mailing system.
 
 
@@ -40,7 +40,7 @@ string_ids are either set explicitly by the programmer or are generated at rando
 
 
 Ok. Now that we have an addressing system, how do we ensure that messages make it to the
-correct mailbox?  Letters are passed by value.
+correct mailbox?  BaseLetters are passed by value.
 
 How do we handle message routing?
 

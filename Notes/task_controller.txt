@@ -1,0 +1,37 @@
+We should coordinate creation of the signal handling thread and those of the task runner
+workers.
+
+
+
+Should the TaskController itself hold and control the thread pool, or should I use an abstration?
+
+Using an abstraction enables us to separate concerns.
+
+Then, if all worker threads are executing TaskRunners, then we need to ensure there is some
+way to assign Tasks to the workers.  A queue works.
+
+Ok. So, TaskRunners also need a Task queue.
+
+We also need some way to monitor TaskRunner load so that new Tasks
+are assigned to the runner with less load. How do we measure load?
+Task total run time?
+
+TaskRunner viability should be a function both of the amount of tasks it is running and
+on the time each task has spent in execution, on average.
+
+If we give Tasks priority, then we also need to take that into consideration.
+
+Priotity should factor into Task execution order, but we need to minimize
+Task starvation.
+
+Ok. Then, each TaskRunner actually needs a Task schedulng algorithm.
+
+Give Tasks the ability to request scheduling exceptions (need more time),
+    and allow them to sleep for at least some specified amount of time.
+
+
+
+The signal thread will not have a scheduler. It doesn't need one.
+
+Let me make one thing clear. All task iterations are allowed to run to completion.
+It's just that their total runtime is checked and used to select which task gets to run next.

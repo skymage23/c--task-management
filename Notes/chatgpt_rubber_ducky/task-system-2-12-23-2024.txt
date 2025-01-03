@@ -26,3 +26,4 @@ Supporting task interruption has its benefits and challenges:
         Increases the risk of unexpected side effects, especially when rolling back state.
 
 If your primary focus is simplicity and robustness, deferring task interruption in favor of cooperative handling (e.g., checking messages or signals during safe points) is often the better choice. Task-local versioning can still be useful for debugging or enhancing resilience without needing to fully support interruptions.
+

@@ -2,14 +2,24 @@ Mailbox:
 //ARP-like functions:
 //Could be changed to return a pointer
 //to the target mailbox.
+private:
 std::string who_has(std::string task_id) {
 
 }
 
-void broadcast(Letter& letter)//?
+void broadcast(BaseLetter& BaseLetter)//?
 
 //This may or may not be needed.
 //I'm not sure if I want to 
 //handle Task ID management
 //this way.
 bool probe(std::string task_id); //needed?
+
+
+//Mailboxes need their own addressing system.
+//We don't need something as complicated as MAC.
+//We can just use an incrementing number.
+
+//We can have a root Mailbox with a hardcoded ID of 0.
+//All other mailboxes are created by this one
+//and given their IDs.
