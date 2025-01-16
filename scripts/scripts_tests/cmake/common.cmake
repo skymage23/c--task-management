@@ -1,0 +1,2 @@
+set(SCRIPTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
+set(HELPERS_DIR "${CMAKE_CURRENT_LIST_DIR}/test_helpers")

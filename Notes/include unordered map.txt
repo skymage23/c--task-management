@@ -1,0 +1,126 @@
+#include <unordered_map>
+
+//These need to be registered with the TaskController.
+//These need to be unchanging after being set.
+//Each datatype cannot have more than one deblobber set.
+//This is necessary so that we don't have to mutex/semaphore-lock
+//the usage of the deblobbers.  A mutex lock is only needed when adding
+//a new deblobber for a type at runtime. It is up to the library-user
+//to ensure their custom deblobbers are written and set correctly
+//and at the correct time.
+
+template <typename T> SerializationHelper {
+    T operator(void *blob_of_blobs, size_t blob_size);
+};
+
+class BlobContainer {
+    std::string datatype;
+    unsigned int index;
+};
+
+class GenericDataContainer {
+    std::vector<char> blob;
+    
+    template <typename T> void add_value
+    void add_int(int input);
+    void add_char(char input);
+    void add_short(char input);
+    void add_long(long input);
+    void add_
+};
+
+//Better idea. We align our blob on word boundaries (page boundaries?).
+//and each index (mapped to name) points to the byte where the datum
+//begins.
+
+//We have a vector of bytes:
+//Variables are mapped to the byte index where the variable's value starts.
+//We do NOT worry about trimming away extra zeros from either end of the datum.
+class TaskReturnValue {
+    
+};
+
+
+Allow grouped-based "direct" communication, where multiple known tasks share a mutex/semaphore-locked queue.
+
+
+Type-erasure:
+
+std::any
+
+How can we mix type-erasure with serialization?
+
+
+We can defer serialization until we NEED to do so.
+
+
+We should be able to get the endianness of the architecture.
+
+We could (and it is reasonable to do so) store all of our data in binary files.
+
+
+If we do structure packing, ... Actually, we should make structure packing an atomic operation. That way,
+we can safely move data around to compact it without having to worry about the user increasing the used
+byte count of the type WHILE we are packing, ruining our current packing strategy.
+
+
+
+So, we need a serialize and a deserialize method, which calls serialize and deserialize methods
+on SerializationHelpers provided for each datatype in the container.
+
+Ok. The library can provide SerializationHelpers for a few expected types, like strings and vectors.
+
+C++ doesn't support annotations. So, we can't easily allow for hinting at which pieces of data are typically used
+together.
+
+We support type-erasure by default and serialization upon request
+
+
+Can we, somehow, use this for version control and re-dos?
+
+Maybe, but it would be unnecessary work at this moment.
+
+The binary serialization output needs to support type specification, offsets, checksuming, etc.
+
+
+
+If we are to allow serialization, then we need serialization helpers and a to know the types we are dealing with.
+
+Ok.  We now know how we can use preprocessor directives to derive type information at compile-time.
+
+We can set a word-size standard for serialization.
+
+We can safely limit outselves to 64-bit.  This is ideal for most usecases.
+
+
+
+
+
+How can we handle registering a data type?
+
+We can use global functions.
+
+The serialization helpers are pretty much set at compile time.
+
+class SerializationHelper <>
+
+template <std::invocable F> internal_add_serialization_helper(
+    std::string datatype,
+    F helper
+);
+
+#define QUOTE(str) #str
+#define EXPAND_AND_QUOTE(str) QUOTE(STR)
+#define add_serialization_helper(t, helper_t, helper) add_serialization_helper(EXPAND_AND_QUOTE(t), F helper)
+
+All of the serialization crap needs to be in its own namespace.
+The serialization helper hashmap needs to be a global in said namespace.
+
+template <typename T>
+concept SerializationFunctor = requires(T t, SerializationHelper& b){
+   { t(b) };
+} 
+
+
+A cleaner way we can do this is to NOT use class overrides but to instead require
+serialization and deserialization functors as arguments to the "add_serialization_helper" function.

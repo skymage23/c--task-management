@@ -1,0 +1,19 @@
+I'm going to need to craft my own convolutional neural network (CNN).
+
+For my inventory app project, it may do me good to hire a 3D modeling artist to create
+3D models of example network closets that I can import into Unreal Engine and use to simulate
+my app's intended usecase.
+
+I will also need a model of an example floor with various rooms and a network closet,
+and that said model follows a floor plan designed by myself.
+
+Honestly, it'd be better to have a "random dungeon generator" (think Mementos from Persona 5).
+That way, we can run it and generate thousands of training and validation examples
+to refine our geographic guidance algorithms.
+
+Perhaps we can also leverage a GPS chip to map longitude and latitude coordinates to a registered building address.
+That way, we can dynamically detect what building the user is in and be able to fetch the address using that information.
+Some of our records inventory require tracking the address of the building where the item is located. 
+That's where this feature will be useful.
+
+Also, how can we adapt to NOT having a floor plan.

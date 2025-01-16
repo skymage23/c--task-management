@@ -74,6 +74,11 @@ namespace task_mgmt {
             virtual void send_outgoing();
             virtual BaseLetter receive();
             bool mail_for_me();
+
+            //Returns true if successful. Else, false.
+            //We may want to make this run the request on another
+            //OneOffTask
+            bool request_direct_connection(unsigned long task_id),
         };
     };
 };

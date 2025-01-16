@@ -1,0 +1,81 @@
+Task lifecycle stages:
+onFirstRun();  //Use this to set up structures whose lifespan lasts as long
+               //as the task itself.
+               //This is analogous to the "onCreate" method used in Android's Activity class.
+               //Albeit, unlike an Android Activity, tasks are intended to run incrementally.
+onPause(); //Move data from RAM onto the disk, perhaps?
+onStart();
+onRestart(); //Maybe load data off of the disk and back into RAM.
+onStop();
+onTaskEnd();
+
+Task lifecycle:
+Stages:
+1. scheduled.
+2. Running.
+-- -- onFirstRun() callback called.
+3. Paused
+-- onPause callback called.
+4. Stopped
+-- -- onStop() callback called.
+5. destroyed.
+-- -- onTaskExit() called.
+-- -- -- This nomenclature is because the task may not necessarily be destroyed in the ideological sense.
+            Rather, it could be that process was terminated due solely to the process being killed to conserve
+            power, memory, or other resources.  The task is not considered "destroyed" because the object
+            itself can still be recreated and the task resumed the next time the program is ran.
+
+
+
+How to handle Task dependencies.
+Remember, Tasks may have a lifetime, but they are NOT necessarily permanent objects.
+
+How do you send messages INTO the task management system?  Via the TaskController and the RootMailbox.
+--For that, the user either needs to be able to name the tasks and indicate the task by name in method calls,
+  or, they need to be given the generated task id to use similarly.
+  
+ Additionally, the user should be able to kill individual tasks as needed.
+ If the user kills a task that another task depends on, then perhaps that 
+    we can notify the other tasks of the death of the dependent task.
+    Or, we can define the ligature when we declare the dependencies.
+    Tasks can have either strong ties or weak ties to each other.
+    If tasks have strong ties to their dependencies, that indicates
+    that these tasks cannot function without each other. Tasks
+    that are weakly dependent on each other, they can still operate
+    with the other task(s).
+    
+    
+
+When to call "onResume".
+--It's main purpose is to restore Task state off of the disk.
+
+What do we call if
+
+What do we do if we kill the process with intent to resume it later?
+
+How do we pass parameters to a Task object?
+
+
+Task needs some way to return data all the way back to the context that created it,
+be it the global process context or another Task.
+
+What the hell does
+
+
+TaskControllerRunnerHandle
+--The Handle to the TaskRunner 
+--I am NOT sold on this.
+-- -- Ok, ok. SOMETHING needs to hold the TaskRunner object. We can make it THIS class, and with that
+      we gain an additional benefit: Only the aspects of the runner that the TaskController needs to touch
+      are made available to it.
+      
+      --Is the TaskRunner instantiated on the underlying thread? Yes.
+      --Does the TaskControllerRunnerHandle hold the "thread" object? Yes.
+      --How does the TaskController emplace a task on the runner?
+      -- -- By using the TaskControllerRunnerHandle object to place the Task in the runner's
+            queue and then signaling the runner to wake up. If the runner is already awake,
+            it will discover the new task during the next iteration of its event loop.
+      
+-- -- How does this integrate with the mailing system?
+TaskRunnerHandle
+--The thingamadoodle that is passed to the Task object and that allows it to interface with the TaskRunner.

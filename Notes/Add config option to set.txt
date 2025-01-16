@@ -1,0 +1,79 @@
+Add config option to set the number of threads allowed.
+
+Mailbox: Separate inboxes for the two different types of messaging: direct and routed.
+         Separate inboxes for different priority mail?
+         
+         
+         
+Ok. DO I NEED TO ABSTRACT AWAY THE THREADING AND THREAD POOL STRUCTURES?
+Why would I do this?
+--iOS provides its own internal task management, and I would feel more comfortable using
+  that underneath as I can reasonably expect it to better handle iPhone app disruptions
+  (switching, locking, etc.).
+  
+--Unreal Engine provides similar, and I would want to use it for the same reasons.
+
+--The only reason I can foresee to use my own task management implementation
+  is to share code between client and server for better integration and easier
+  development (shared code means less code of which to keep track).
+  
+  
+Since this WILL affect how I architect my task management solution, I need time
+to think these possibilities over.
+
+I think the answer is no, but I am not certain.
+
+We already mentioned the benefits of abstracting away the threading code,
+but what would be the costs?
+-- Increased complexity in the design and implementation of the
+   threading code.
+
+-- Increased Task design complexity because, to account for use in mobile,
+   it would need a life cycle concept.
+   
+We may need a threading model to handle ml and networking tasks using the same
+C++ library across all platforms. That makes some sense.
+
+This raises further questions:
+Since PCs don't necessarily need lifecycle management (laptops excepted),
+what do we do in PC. The same. The main difference would be the lifecycle
+methods would not be called as often.
+
+Since PCs do NOT provide any framework for checking power levels or
+lock states on their own, WE need to provide that code. Fun.
+
+Threading:
+ThreadPool class.
+  Each thread has a TaskRunner on it that handles the event loop.
+
+Is there anything else we need? Signal handlers? Anything?
+Maybe code to wake the thread up.
+
+
+Do TaskRunners need to be broken up between what runs on the thread
+and what the TaskController holds, either directly or indirectly?
+
+Ok. So, what does the "pool" consist of? TaskRunner "handles"?
+With each "handle" itself housing and controlling its "thread".
+-- Yeah, that would be the "best" way to handle it.
+-- Then, we need to rethink our TaskRunner "handles".
+-- -- Why? The Task objects also need a handle, but with a different API.
+
+
+
+Before we continue ANY further, let's set in stone the library initialization procedure.
+The library should contain a library-scope "initialize()" function that sets up
+the task management main structures, like the TaskController.
+
+The user never touches the TaskController. Instead, all related arguments are 
+passed to the "initialize()" function.
+
+After, users use "" (and "") to queue up tasks for execution.
+
+How does the user interface with this library (other than "initialize()")?
+-- Well, the initialize() function needs to register every single thing that needs to be
+
+-- Well, we need to register our lifecycle controls.  A shitload of that will have to be
+   handled via process signals.
+
+
