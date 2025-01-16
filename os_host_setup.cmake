@@ -31,7 +31,7 @@ endfunction()
 #Host OS specific setup:
 if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
     #Dependencies
-    look_for_dependency_program(powershell pwsh)
+    look_for_dependency_program("powershell" "pwsh")
     if(NOT FOUND_ALTERNATIVE)
         message(FATAL_ERROR "PowerShell not found.")
     endif()
@@ -53,14 +53,23 @@ if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
                         	
 elseif(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Linux")
     #dependencies:
-    #Make sure "realpath" exists:
-    if(NOT IS_EXECUTABLE "/usr/bin/realpath")
-        message(FATAL_ERROR "\"realpath\" not found in \"/usr/bin\".")
+    look_for_dependency_program("realpath")
+    if(NOT FOUND_ALTERNATIVE)
+        message(FATAL_ERROR "\"realpath\" not found.")
     endif()
-
     #OS-specific functions:
-    #function (get_realpath_command RELATIVE_PATH)
-    #    set(REALPATH_COMMAND "/usr/bin/realpath ${REALPATH_COMMAND}" PARENT_SCOPE)
-    #endfunction()
+    set(REALPATH_COMMAND ${FOUND_ALTERNATIVE})
+    function (get_realpath RELATIVE_PATH)
+	    execute_process(
+	        COMMAND ${REALPATH_COMMAND} "${RELATIVE_PATH}"
+		RESULT_VARIABLE RESULT_CODE
+		OUTPUT_VARIABLE REALPATH
+		COMMAND_ECHO STDOUT
+	    )
+	    if(NOT REALPATH OR NOT RESULT_CODE EQUAL 0)
+		    message(FATAL_ERROR "Unable to resolve path \"${RELATIVE_PATH}\". Result code: ${RESULT_CODE}")
+	    endif()
+	    set(REALPATH ${REALPATH} PARENT_SCOPE)
+    endfunction()       	
 #elseif(${CMAKE_HOST_SYSTEM_NAME} == "macOS")
 endif()
