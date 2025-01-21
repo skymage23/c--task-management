@@ -1,42 +1,34 @@
-
-include(${CMAKE_SOURCE_DIR}/scripts/cmake/stack.cmake)
-
-# Iterate over all targets in the projecti
-
-#set(DIRECTORIES)
-#get_property(DIRECTORIES DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY SUBDIRECTORIES)
-#message(STATUS "DIRECTORIES: ${DIRECTORIES}")
-
-function(get_realpath PATH)
-    set(GET_REALPATH_OUTPUT "" PARENT_SCOPE)
-    execute_process(
-        COMMAND /usr/bin/realpath
-    )
-endfunction()
-
+include_guard(GLOBAL)
+include(${CMAKE_SCRIPTS_DIR}/debug.cmake)
+include(${CMAKE_SCRIPTS_DIR}/stack.cmake)
 
 function(get_subdirectories_with_cmake_lists_txt DIRECTORY)
+    assert_is_directory("${DIRECTORY}")
+
     set(GET_SUBDIRECTORIES_OUTPUT "" PARENT_SCOPE)
-    set(STACK "STACK")
+    set(SUBDIR_OUTPUT_LIST "")
+    set(STACK "")
     set(STACK_EMPTY FALSE)
+    set(STACK_ELEM_TEMP "")
     stack_init(STACK)
-    set(SUBDIRECTORIES)
-    get_property(SUBDIRECTORIES DIRECTORY "${DIRECTORY}" PROPERTY SUBDIRECTORIES)
-    foreach(SUBDIRECTORY ${SUBDIRECTORIES})
-        if(EXISTS "${SUBDIRECTORY}/CMakeLists.txt")
+    set(SUBDIRECTORY "")
+    set(SUBDIRECTORIES "")
+
+    message(STATUS "DIRECTORY: ${DIRECTORY}")
+    stack_push(STACK ${DIRECTORY})
+    
+    stack_is_empty(STACK STACK_EMPTY)
+    while(NOT ${STACK_EMPTY})
+        stack_pop(STACK STACK_ELEM_TEMP)
+            print_debug("STACK_ELEM_TEMP: ${STACK_ELEM_TEMP}" "${CMAKE_CURRENT_FUNCTION}")
+        get_property(SUBDIRECTORIES DIRECTORY ${STACK_ELEM_TEMP} PROPERTY SUBDIRECTORIES)
+        foreach(SUBDIRECTORY ${SUBDIRECTORIES})
+            list(APPEND SUBDIR_OUTPUT_LIST ${SUBDIRECTORY})
             stack_push(STACK ${SUBDIRECTORY})
-        endif()
-    endforeach()
-    stack_is_empty(STACK_NAME STACK STACK_EMPTY)
-    while(NOT STACK_EMPTY)
-        stack_pop(STACK SUBDIRECTORY)
-        if(EXISTS "${SUBDIRECTORY}/CMakeLists.txt")
-            set(SUBDIRECTORIES ${SUBDIRECTORIES} ${SUBDIRECTORY})
-            foreach(SUBDIRECTORY ${SUBDIRECTORIES})
-                stack_push(STACK ${SUBDIRECTORY})
-            endforeach()
-        endif()
+        endforeach()
+        stack_is_empty(STACK STACK_EMPTY)
     endwhile()
-    set(${GET_SUBDIRECTORIES_OUTPUT} ${SUBDIRECTORIES} PARENT_SCOPE)
+    set(GET_SUBDIRECTORIES_OUTPUT "${SUBDIR_OUTPUT_LIST}" PARENT_SCOPE)
+
 endfunction()
 

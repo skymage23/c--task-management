@@ -1,7 +1,7 @@
+include_guard(GLOBAL)
+
 #Universal dependencies:
 find_package(Python3)
-
-
 #preliminary universal functions
 
 function(find_dependency_program PROGRAM_NAME)
@@ -36,41 +36,9 @@ if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
         message(FATAL_ERROR "PowerShell not found.")
     endif()
     set(POWERSHELL_COMMAND ${FOUND_ALTERNATIVE})
-                                
-    #OS-specific functions:
-    function (get_realpath RELATIVE_PATH)
-	    execute_process(
-                COMMAND ${POWERSHELL_COMMAND} -Command "$(Resolve-Path -Path \"${RELATIVE_PATH}\").Path"
-		OUTPUT_VARIABLE REALPATH
-		COMMAND_ECHO STDOUT
-		COMMAND_ERROR_IS_FATAL ANY
-	    )
-	    if(NOT REALPATH)
-	        message(FATAL_ERROR "Unable to resolve path \"${RELATIVE_PATH}\".")
-	    endif()
-	    set(REALPATH ${REALPATH} PARENT_SCOPE)
-    endfunction()       	
-                        	
+                                	
 elseif( ${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Darwin")
-    #dependencies:
-    look_for_dependency_program("realpath")
-    if(NOT FOUND_ALTERNATIVE)
-        message(FATAL_ERROR "\"realpath\" not found.")
-    endif()
-    #OS-specific functions:
-    set(REALPATH_COMMAND ${FOUND_ALTERNATIVE})
-    function (get_realpath RELATIVE_PATH)
-	    execute_process(
-	        COMMAND ${REALPATH_COMMAND} "${RELATIVE_PATH}"
-		RESULT_VARIABLE RESULT_CODE
-		OUTPUT_VARIABLE REALPATH
-		COMMAND_ECHO STDOUT
-	    )
-	    if(NOT REALPATH OR NOT RESULT_CODE EQUAL 0)
-		    message(FATAL_ERROR "Unable to resolve path \"${RELATIVE_PATH}\". Result code: ${RESULT_CODE}")
-	    endif()
-	    set(REALPATH ${REALPATH} PARENT_SCOPE)
-    endfunction()
+
 else()
     message(FATAL_ERROR "\"${CMAKE_HOST_SYSTEM_NAME}\" is not a supported build host OS.")
 endif()

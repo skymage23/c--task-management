@@ -1,4 +1,7 @@
-include(${CMAKE_SOURCE_DIR}/scripts/cmake/dir_opts.cmake)
+include_guard(GLOBAL)
+include(${CMAKE_CURRENT_LIST_DIR}/../common.cmake)
+
+include(${CMAKE_SCRIPTS_DIR/dir_opts.cmake)
 # Create a list to store executable names
 
 set(GET_TARGETS_OUTPUT)

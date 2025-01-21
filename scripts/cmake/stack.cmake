@@ -1,3 +1,4 @@
+include_guard(GLOBAL)
 # Stack implementation using CMake lists
 # Usage: include(stack.cmake)
 

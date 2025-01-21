@@ -1,0 +1,11 @@
+include_guard(GLOBAL)
+
+file(REAL_PATH "${CMAKE_CURRENT_LIST_DIR}/../.." PROJECT_BASE)
+message(STATUS "PROJECT_BASE: ${PROJECT_BASE}")
+#include(${PROJECT_BASE}/os_host_setup.cmake)
+
+file(REAL_PATH "${PROJECT_BASE}/scripts" SCRIPTS_DIR)
+message(STATUS "SCRIPTS_DIR: ${SCRIPTS_DIR}")
+
+file(REAL_PATH "${SCRIPTS_DIR}/cmake" CMAKE_SCRIPTS_DIR)
+message(STATUS "CMAKE_SCRIPTS_DIR: ${CMAKE_SCRIPTS_DIR}")

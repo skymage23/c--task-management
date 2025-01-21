@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(cplusplus-task-management  CXX)
+include(cmake_build_system_message.cmake)
+
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 #Test helper scripts before anything else.

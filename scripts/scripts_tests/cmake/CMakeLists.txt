@@ -1,7 +1,11 @@
-set (CMAKE_SCRIPTS_DIR "${CMAKE_SOURCE_DIR}/scripts/scripts_tests/cmake")
+cmake_minimum_required(VERSION 3.31)
+project(cmake_script_tests)
+#
+# Here, we are mainly concerned with testing the CMake scripts.
+# For testing purposes, we make up some nonsense targets
+#
 
-execute_process(COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SCRIPTS_DIR}/test_get_dirs_with_cmake_lists.cmake
-   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-   COMMAND_ECHO STDOUT
-   COMMAND_ERROR_IS_FATAL ANY
-)
+
+add_subdirectory(custom_targets)
+
+include(test_get_dirs_with_cmake_lists.cmake)
