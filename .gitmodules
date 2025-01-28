@@ -1,3 +1,6 @@
 [submodule "tests/third_party/googletest"]
 	path = tests/third_party/googletest
 	url = https://github.com/google/googletest
+[submodule "scripts/scripts_tests/cmake/third_party/cmake-script-test-framework"]
+	path = scripts/scripts_tests/cmake/third_party/cmake-script-test-framework
+	url = https://github.com/skymage23/cmake-script-test-framework
